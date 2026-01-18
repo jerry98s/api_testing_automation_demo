@@ -211,6 +211,246 @@ Check job status.
 
 ---
 
+## API Response Structures
+
+This section documents the raw JSON response structures received from each API endpoint.
+
+### CoinGecko API
+
+**Endpoint:** `GET /coins/markets`
+
+**Response Type:** `List[dict]` (array of coin objects)
+
+**Example Response:**
+```json
+[
+  {
+    "id": "bitcoin",
+    "symbol": "btc",
+    "name": "Bitcoin",
+    "current_price": 45000.50,
+    "market_cap": 850000000000,
+    "market_cap_rank": 1,
+    "total_volume": 25000000000,
+    "high_24h": 46000.00,
+    "low_24h": 44000.00,
+    "price_change_24h": 500.50,
+    "price_change_percentage_24h": 1.12,
+    "circulating_supply": 19500000.0,
+    "total_supply": 21000000.0,
+    "max_supply": 21000000.0,
+    "last_updated": "2024-01-15T12:30:45.000Z"
+  },
+  {
+    "id": "ethereum",
+    "symbol": "eth",
+    "name": "Ethereum",
+    "current_price": 2800.75,
+    "market_cap": 350000000000,
+    "market_cap_rank": 2,
+    "total_volume": 15000000000,
+    "high_24h": 2900.00,
+    "low_24h": 2700.00,
+    "price_change_24h": 50.25,
+    "price_change_percentage_24h": 1.83,
+    "circulating_supply": 120000000.0,
+    "total_supply": 120000000.0,
+    "max_supply": null,
+    "last_updated": "2024-01-15T12:30:45.000Z"
+  }
+]
+```
+
+**Key Fields:**
+- `id`: Unique identifier (string)
+- `symbol`: Ticker symbol (string, lowercase)
+- `current_price`: Current USD price (float, > 0)
+- `last_updated`: ISO 8601 timestamp (datetime)
+- `high_24h` / `low_24h`: 24-hour price range (float, optional)
+- `market_cap`: Market capitalization (int, optional)
+
+**Note:** Response is an array, not wrapped in an object. Each item represents one cryptocurrency.
+
+---
+
+### RandomUser API
+
+**Endpoint:** `GET /?results=50`
+
+**Response Type:** `dict` with `results` array and `info` object
+
+**Example Response:**
+```json
+{
+  "results": [
+    {
+      "gender": "female",
+      "name": {
+        "title": "Mrs",
+        "first": "Esther",
+        "last": "Longoria"
+      },
+      "location": {
+        "street": {
+          "number": 9812,
+          "name": "Circuito Malasia"
+        },
+        "city": "El Chote",
+        "state": "Jalisco",
+        "country": "Mexico",
+        "postcode": 13967,
+        "coordinates": {
+          "latitude": "27.5977",
+          "longitude": "148.4798"
+        },
+        "timezone": {
+          "offset": "-1:00",
+          "description": "Azores, Cape Verde Islands"
+        }
+      },
+      "email": "esther.longoria@example.com",
+      "login": {
+        "uuid": "6766f547-0a24-4755-be2f-026767582bb1",
+        "username": "yellowbear262",
+        "password": "bubba123",
+        "salt": "NksEtwn3",
+        "md5": "73b6878d517f83379d6dfd38fc0f7d1d",
+        "sha1": "c1b2b0c37174867d53007858de4d007b7edaf96d",
+        "sha256": "aeec5f11a68b34601356903007def180ed3134e146a0dc1eb4f16ea88e628611"
+      },
+      "dob": {
+        "date": "1967-02-19T12:26:54.026Z",
+        "age": 58
+      },
+      "registered": {
+        "date": "2011-09-20T18:25:43.751Z",
+        "age": 14
+      },
+      "phone": "(643) 517 7129",
+      "cell": "(694) 914 9112",
+      "id": {
+        "name": "NSS",
+        "value": "27 07 63 2528 6"
+      },
+      "picture": {
+        "large": "https://randomuser.me/api/portraits/women/40.jpg",
+        "medium": "https://randomuser.me/api/portraits/med/women/40.jpg",
+        "thumbnail": "https://randomuser.me/api/portraits/thumb/women/40.jpg"
+      },
+      "nat": "MX"
+    }
+  ],
+  "info": {
+    "seed": "cbdd6fae1fbb7764",
+    "results": 50,
+    "page": 1,
+    "version": "1.4"
+  }
+}
+```
+
+**Key Fields:**
+- `results`: Array of user objects (List[User])
+- `info`: Metadata about the request
+  - `seed`: Random seed used for generation
+  - `results`: Number of users returned
+  - `page`: Page number
+  - `version`: API version
+
+**User Object Fields:**
+- `gender`: "male" or "female" (string)
+- `name`: Nested object with `title`, `first`, `last` (string)
+- `location`: Nested object with address, coordinates, timezone
+- `postcode`: Can be `string` or `int` depending on country
+- `email`: Email address (string)
+- `dob` / `registered`: Date objects with `date` (ISO 8601) and `age` (int)
+- `nat`: 2-letter nationality code (string)
+
+**Note:** `postcode` field type varies by country (string for some, int for others).
+
+---
+
+### Snowflake API (Internal)
+
+#### POST `/snowflake/copy-into`
+
+**Response Type:** `dict` with job submission details
+
+**Response (202 Accepted):**
+```json
+{
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "QUEUED",
+  "message": "Load job submitted successfully."
+}
+```
+
+**Key Fields:**
+- `job_id`: Unique job identifier (UUID string)
+- `status`: Job status enum (`QUEUED`, `RUNNING`, `SUCCESS`, `FAILED`)
+- `message`: Human-readable status message (string)
+
+---
+
+#### GET `/snowflake/monitor/{job_id}`
+
+**Response Type:** `dict` with job status and results
+
+**Success Response (200):**
+```json
+{
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "SUCCESS",
+  "message": "Load completed successfully.",
+  "rows_loaded": 2,
+  "error_details": null
+}
+```
+
+**Failure Response (200):**
+```json
+{
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "FAILED",
+  "message": "Load job failed validation.",
+  "rows_loaded": null,
+  "error_details": {
+    "error_code": "NOT_NULL_VIOLATION",
+    "error_message": "Row at index 1 is missing required field 'id'",
+    "failed_rows": 1
+  }
+}
+```
+
+**Queued/Running Response (200):**
+```json
+{
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "QUEUED",
+  "message": "Job is queued for processing.",
+  "rows_loaded": null,
+  "error_details": null
+}
+```
+
+**Key Fields:**
+- `job_id`: Same UUID from submission (string)
+- `status`: Current job status (enum)
+- `message`: Status description (string)
+- `rows_loaded`: Number of rows successfully loaded (int, null if not completed)
+- `error_details`: Error object if failed, null otherwise
+  - `error_code`: Error type identifier (string)
+  - `error_message`: Human-readable error description (string)
+  - `failed_rows`: Number of rows that failed (int, optional)
+
+**Status Flow:**
+1. `QUEUED` → Job submitted, waiting
+2. `RUNNING` → Job processing
+3. `SUCCESS` → Job completed, `rows_loaded` populated
+4. `FAILED` → Job failed, `error_details` populated
+
+---
+
 ## Dependencies
 
 ```
