@@ -23,6 +23,7 @@ pytest tests/ -v
 # Run specific test suites
 pytest tests/test_snowflake.py -v    # Internal API tests
 pytest tests/test_coingecko.py -v    # External API tests
+pytest tests/test_randomuser.py -v   # RandomUser API tests
 ```
 
 ## Project Structure
@@ -41,8 +42,10 @@ api_testing_automation_demo/
 │   ├── schemas/                # Pydantic models for validation
 │   │   ├── __init__.py
 │   │   ├── coingecko.py        # CoinGecko response schemas
-│   │   └── snowflake.py        # Snowflake response schemas
+│   │   ├── snowflake.py        # Snowflake response schemas
+│   │   └── randomuser.py       # RandomUser response schemas
 │   ├── test_coingecko.py       # External API tests (DQ checks)
+│   ├── test_randomuser.py      # RandomUser API tests (DQ checks)
 │   └── test_snowflake.py       # Internal API tests (schema validation)
 │
 ├── requirements.txt

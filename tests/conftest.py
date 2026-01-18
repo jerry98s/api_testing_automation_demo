@@ -39,6 +39,33 @@ def crypto_data(coingecko_client):
 
 
 # =============================================================================
+# RANDOMUSER (External API)
+# =============================================================================
+
+@pytest.fixture(scope="session")
+def randomuser_client():
+    """RandomUser API client - session scoped to minimize API calls."""
+    return ExternalAPIClient(
+        base_url="https://randomuser.me/api",
+        headers={"Accept": "application/json"}
+    )
+
+
+@pytest.fixture(scope="session")
+def randomuser_data(randomuser_client):
+    """
+    Fetch 50 random users once per session.
+    
+    Session-scoped to minimize API calls.
+    RandomUser API has no rate limits but we still want to be respectful.
+    """
+    response = randomuser_client.get("/", params={"results": 50})
+    assert response.status_code == 200, \
+        f"RandomUser API error. Status: {response.status_code}"
+    return response.json()
+
+
+# =============================================================================
 # SNOWFLAKE (Internal API)
 # =============================================================================
 

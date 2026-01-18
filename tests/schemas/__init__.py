@@ -8,6 +8,17 @@ from tests.schemas.snowflake import (
     JobSubmissionResponse,
     JobStatus,
 )
+from tests.schemas.randomuser import (
+    RandomUserResponse,
+    User,
+    Name,
+    Location,
+    Login,
+    DateOfBirth,
+    Registered,
+    Picture,
+    Info,
+)
 
 __all__ = [
     "CoinMarketData",
@@ -17,4 +28,13 @@ __all__ = [
     "CopyCommand",
     "JobSubmissionResponse",
     "JobStatus",
+    "RandomUserResponse",
+    "User",
+    "Name",
+    "Location",
+    "Login",
+    "DateOfBirth",
+    "Registered",
+    "Picture",
+    "Info",
 ]
